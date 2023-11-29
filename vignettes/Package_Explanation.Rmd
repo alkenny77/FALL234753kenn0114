@@ -1,0 +1,122 @@
+---
+title: "Explanation of my R Package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Explanation of my R Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(FALL234753kenn0114)
+```
+
+# Introduction
+This vignette describes what the package FALL234753kenn0114 does. This package contains a number of methods which help us solve various statistical problems. It also contains a dataset named "fire", which is a dataset comparing distance from a fire station to damages sustained in a fire. Let's get into what each function in the dataset does.
+
+# fire
+
+```{r}
+fire <- FALL234753kenn0114::fire
+```
+This is the aforementioned fire dataset. We will be using this dataset to demonstrate how the other functions in this package which require statistical data work. As we can see, the dataset contains values for distance and damage.
+
+# myboot2
+
+myboot2 takes a bootstrap sample for a specific source of data.
+
+```{r}
+FALL234753kenn0114::myboot2(x=fire$DAMAGE)
+```
+
+From the bootstrapped sample, we see that the function produces a histogram showing the mean of the bootstrapped sample, and a confidence interval; (default set at 95%) for the sample. 
+
+# myci
+
+myci calculates a 95% confidence interval using t-values for a given set of data:
+
+```{r}
+FALL234753kenn0114::myci(fire$DAMAGE)
+```
+
+We see that the function returns a confidence interval for the fire damages.
+
+# mycltu
+This function demonstrates the central limit therem for a uniform distribution.
+```{r}
+FALL234753kenn0114::mycltu(10, iter=1000)
+```
+
+We see the function return a historgram of the sample mean and density. To achieve this, we took a random sample of size 10, 0000 times for the uniform distribution. We should see the distribution of sample means begin to follow a normal distribution, which is what we see happen here, proving the central limit theorem.
+
+# myf
+
+myf calculates the piecewise values to be plotted for piecewise regression. x is a vector of values to be used, xk is the value on the graph where the graph changes shape in pieceiwse fashion, and coef is the coefficients of the piecewise mode.
+
+```{r}
+fire.lm<- lm(DAMAGE~DISTANCE + I(DISTANCE^2), data=fire)
+FALL234753kenn0114::myf(x=c(1:21), xk=17, coef=fire.lm$coefficients)
+```
+Here we see what values would be plotted for a piecewise regression model should we use fire.lm.
+
+# myfun
+
+myfun is a simple function which takes an x-value, squares it, and adds 10
+
+```{r}
+myfun(-5)
+```
+$(-5)^2+10=35$. Self-explanatory
+
+# mymaxlik
+
+mymaxlike calculates the maximum likelihood estimator using various methods for a specific sample. Quite a bit goes into this one. We first need our lfun, which we define here as the likelihood function for a binomial distribution of size 20. Then, we need an input vecotr of values, x. Finally, we need param, which is simply a way to test over and over again and find the maximum likelihood.
+```{r}
+logbin=function(x,param) log(dbinom(x,prob=param,size=20))
+FALL234753kenn0114::mymaxlik(lfun=logbin, x=c(2,2,2,3,4,5), param=seq(0,1,length=1000))
+```
+
+The function gives us output in a list and as a graph. The list contains various important computed qualities, including parami which is the MLE estimate. The graph shows where the slope is maximized, which is where the MLE estimate lies.
+
+# myncurve
+
+myncurve graphs and calculates the area under a normal curve for the probability of a certain event for a normal distribution. It takes the mean and standard deviation of the distribution, and what probability you would like to solve for.
+
+```{r}
+FALL234753kenn0114::myncurve(10,3,6)
+```
+
+We see the red region is the probability that x is less than 6 in this normal distribution with mean 10 and standard deviation 3. We see that the probability of this isn't too high, but still definitely possible.
+
+# mynewsample
+
+mynewsample takes a sample n times from a list of numbers 1-10 and produces a barplot of the results, iter times. 
+
+```{r}
+FALL234753kenn0114::mynewsample(20, iter=5)
+```
+
+We see variations among the 5 iterations in how many times each number was picked for each run (i.e 3 was selected a lot in the 5th run) showing the variations in each sample.
+
+# ntickets
+
+ntickets is the function we used in project 1 to calculate the ideal number of tickets the airline should sell. It takes in the number of seats on the flight, N, the probability of overbooking, gamma, and the probability a person showing up to the flight, p.
+
+```{r}
+par(mar=c(1,1,1,1))
+FALL234753kenn0114::ntickets(N=400, gamma=0.05, p=0.95)
+
+```
+
+We see it produce two graphs, one showing a discrete distribution and another the continuous. For both cases, it identifies the ideal number of tickets that need to be sold. In this case, for 400 seats it seems the value is close to 413/414.
+
+# Conclusion
+
+Thus, we have gone over every function contained in this package. I hope it is informative.
